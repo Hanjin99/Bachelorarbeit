@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: efficient-probit-regression
+Version: 0.1.0
+Author: Christian Peters
+Requires-Dist: joblib
+Requires-Dist: numba
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scikit-learn
+Requires-Dist: scipy
+Requires-Dist: statsmodels
+Requires-Dist: tqdm
+Dynamic: author
+Dynamic: requires-dist
