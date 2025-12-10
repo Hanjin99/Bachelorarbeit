@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.stats import expon
+from scipy.sparse import diags
 
 # random number generator
 _rng = np.random.default_rng()
-
 
 def _check_sample(X, y, sample_size):
     if X.shape[0] != y.shape[0]:
@@ -74,23 +74,6 @@ def fast_QR(X, p=2):
     return Q
 
 
-def compute_leverage_scores(X: np.ndarray, p=2, fast_approx=False):  
-    """
-        Computes leverage scores.
-    """
-    if not len(X.shape) == 2:
-        raise ValueError("X must be 2D!")
-
-    if not fast_approx: # boolean, schnellere oder nicht die schnellere Q-R-Zerlegung
-        Q, *_ = np.linalg.qr(X)
-    else:
-        Q = fast_QR(X, p=p)  # ein Möglichkeit wie man eine Zerlegung schneller machen kann
-
-    leverage_scores = np.power(np.linalg.norm(Q, axis=1, ord=p), p)
-
-    return leverage_scores
-
-
 def _round_up(x: np.ndarray) -> np.ndarray:
     """
     Rounds each element in x up to the nearest power of two.
@@ -151,6 +134,26 @@ def logit_sampling(X: np.ndarray, y: np.ndarray, sample_size: int):
     return X[sample_indices], y[sample_indices], w[sample_indices]
 
 
+# leverage scores
+
+
+def compute_leverage_scores(X: np.ndarray, p=2, fast_approx=False):  
+    """
+        Computes leverage scores.
+    """
+    if not len(X.shape) == 2:
+        raise ValueError("X must be 2D!")
+
+    if not fast_approx: # boolean, schnellere oder nicht die schnellere Q-R-Zerlegung
+        Q, *_ = np.linalg.qr(X)
+    else:
+        Q = fast_QR(X, p=p)  # ein Möglichkeit wie man eine Zerlegung schneller machen kann
+
+    leverage_scores = np.power(np.linalg.norm(Q, axis=1, ord=p), p)
+
+    return leverage_scores
+
+
 def leverage_score_sampling(
     X: np.ndarray,
     y: np.ndarray,
@@ -206,3 +209,78 @@ def leverage_score_sampling(
     )
 
     return X[sample_indices], y[sample_indices], w[sample_indices]
+
+
+# lewis weights
+
+
+def _calculate_lev_score_exact(X):
+    Xt = X.T
+    XXinv = np.linalg.pinv(Xt.dot(X))
+    lev = np.zeros(X.shape[0])
+    for i in range(X.shape[0]):
+        xi = X[i : i + 1, :]
+        lev[i] = (xi.dot(XXinv)).dot(xi.T)
+    return lev
+
+
+def _calculate_lewis_weights_exact(X, p=1.0, T=20):
+    n = X.shape[0]
+    w = np.ones(n)
+
+    for i in range(T):
+        Wp = diags(np.power(w, 0.5 - 1.0 / p))
+        # Q = qr(Wp.dot(X))
+        # s = _calculate_sensitivities_leverage(Q)
+        s = _calculate_lev_score_exact(Wp.dot(X))
+        w_nxt = np.power(w, 1.0 - p / 2.0) * np.power(s, p / 2.0)
+        # print("|w_t - w_t+1|/|w_t| = ", np.linalg.norm(w - w_nxt) / np.linalg.norm(w))
+        w = w_nxt
+
+    return np.array(w + 1.0 / n, dtype=float)
+
+
+def _calculate_lewis_weights_fast(X, p=1.0, T=20):
+    n = X.shape[0]
+    w = np.ones(n)
+
+    for i in range(T):
+        # assert min(w) > 0, str(min(w))
+        Wp = diags(np.power(w, 0.5 - 1.0 / p))
+
+        Q = fast_QR(Wp.dot(X), p=2)
+        s = np.power(np.linalg.norm(Q, axis=1, ord=2), 2)
+        w_nxt = np.power(w, 1.0 - p / 2.0) * np.power(s, p / 2.0)
+        # print("|w_t - w_t+1|/|w_t| = ", npl.norm(w - w_nxt) / npl.norm(w))
+        w = w_nxt
+
+    return np.array(w + 1.0 / n, dtype=float)
+
+
+def lewis_sampling(
+    X: np.ndarray,
+    y: np.ndarray,
+    sample_size: int,
+    p: float = 1.0,
+    precomputed_weights=None,
+    fast_approx=False,
+):
+    """
+    Returns X_reduced, y_reduced, probabilities
+    """
+    if precomputed_weights is None:
+        if fast_approx:
+            s = _calculate_lewis_weights_fast(X, p=p)
+        else:
+            s = _calculate_lewis_weights_exact(X, p=p)
+    else:
+        s = precomputed_weights
+
+    # calculate probabilities
+    p = s / np.sum(s)
+
+    # draw the sample
+    rng = np.random.default_rng()
+    sample_indices = rng.choice(X.shape[0], size=sample_size, replace=False, p=p)
+
+    return X[sample_indices], y[sample_indices], p[sample_indices]
