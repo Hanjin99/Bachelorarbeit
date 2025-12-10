@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import ndarray
 from scipy.stats import expon
 from scipy.sparse import diags
 
@@ -35,7 +36,7 @@ def uniform_sampling(X: np.ndarray, y: np.ndarray, sample_size: int):
     return X[sample_indices], y[sample_indices]
 
 
-def fast_QR(X, p=2):
+def fast_QR(X, p=2.0):
     """
     Returns Q of a fast QR decomposition of X.
     """
@@ -87,6 +88,20 @@ def _round_up(x: np.ndarray) -> np.ndarray:
     results[greater_zero] = np.power(2, np.ceil(np.log2(x[greater_zero])))
 
     return results
+
+
+def to_density(X: np.ndarray):
+    """
+    Turns scores into a density.
+    """
+    return X / np.sum(X)
+
+
+def to_density_X_Y(X: ndarray, Y: ndarray):
+    """
+    Turns the combination of two scores into a density.
+    """
+    return (X + Y) / (X.sum() + Y.sum())
 
 
 def logit_sampling(X: np.ndarray, y: np.ndarray, sample_size: int):
@@ -213,8 +228,8 @@ def leverage_score_sampling(
 
 # lewis weights
 
-
-def _calculate_lev_score_exact(X):
+# berechnet l_2 leverage score
+def calculate_lev_score_exact(X):
     Xt = X.T
     XXinv = np.linalg.pinv(Xt.dot(X))
     lev = np.zeros(X.shape[0])
@@ -224,7 +239,7 @@ def _calculate_lev_score_exact(X):
     return lev
 
 
-def _calculate_lewis_weights_exact(X, p=1.0, T=20):
+def calculate_lewis_weights_exact(X, p=1.0, T=20):
     n = X.shape[0]
     w = np.ones(n)
 
@@ -232,15 +247,16 @@ def _calculate_lewis_weights_exact(X, p=1.0, T=20):
         Wp = diags(np.power(w, 0.5 - 1.0 / p))
         # Q = qr(Wp.dot(X))
         # s = _calculate_sensitivities_leverage(Q)
-        s = _calculate_lev_score_exact(Wp.dot(X))
+        s = calculate_lev_score_exact(Wp.dot(X))
         w_nxt = np.power(w, 1.0 - p / 2.0) * np.power(s, p / 2.0)
         # print("|w_t - w_t+1|/|w_t| = ", np.linalg.norm(w - w_nxt) / np.linalg.norm(w))
         w = w_nxt
 
-    return np.array(w + 1.0 / n, dtype=float)
+    # return np.array(w + 1.0 / n, dtype=float) #TODO
+    return np.array(w, dtype=float)
 
 
-def _calculate_lewis_weights_fast(X, p=1.0, T=20):
+def calculate_lewis_weights_fast(X, p=1.0, T=20):
     n = X.shape[0]
     w = np.ones(n)
 
@@ -248,13 +264,14 @@ def _calculate_lewis_weights_fast(X, p=1.0, T=20):
         # assert min(w) > 0, str(min(w))
         Wp = diags(np.power(w, 0.5 - 1.0 / p))
 
-        Q = fast_QR(Wp.dot(X), p=2)
+        Q = fast_QR(Wp.dot(X), p)
         s = np.power(np.linalg.norm(Q, axis=1, ord=2), 2)
         w_nxt = np.power(w, 1.0 - p / 2.0) * np.power(s, p / 2.0)
         # print("|w_t - w_t+1|/|w_t| = ", npl.norm(w - w_nxt) / npl.norm(w))
         w = w_nxt
 
-    return np.array(w + 1.0 / n, dtype=float)
+    #return np.array(w + 1.0 / n, dtype=float)
+    return np.array(w, dtype=float)
 
 
 def lewis_sampling(
@@ -270,9 +287,9 @@ def lewis_sampling(
     """
     if precomputed_weights is None:
         if fast_approx:
-            s = _calculate_lewis_weights_fast(X, p=p)
+            s = calculate_lewis_weights_fast(X, p=p)
         else:
-            s = _calculate_lewis_weights_exact(X, p=p)
+            s = calculate_lewis_weights_exact(X, p=p)
     else:
         s = precomputed_weights
 
@@ -284,3 +301,17 @@ def lewis_sampling(
     sample_indices = rng.choice(X.shape[0], size=sample_size, replace=False, p=p)
 
     return X[sample_indices], y[sample_indices], p[sample_indices]
+
+
+# Kombination von l_2 und l_p leverage scores
+
+def calculate_l2_lp_leverage_score(X: np.ndarray, p=2, fast_approx=False):
+    """
+    Returns the sum of the l_2 and l_p leverage scores (total_score), and it's density (p).
+    """
+    l_2_leverage_score = calculate_lev_score_exact(X)
+    l_p_leverage_score = compute_leverage_scores(X, p=p, fast_approx=fast_approx)
+    p = to_density_X_Y(l_2_leverage_score, l_p_leverage_score)
+    total_score = l_2_leverage_score + l_p_leverage_score
+
+    return total_score, p
