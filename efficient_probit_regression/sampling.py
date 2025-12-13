@@ -235,7 +235,8 @@ def calculate_lev_score_exact(X):
     lev = np.zeros(X.shape[0])
     for i in range(X.shape[0]):
         xi = X[i : i + 1, :]
-        lev[i] = (xi.dot(XXinv)).dot(xi.T)
+        val = (xi.dot(XXinv)).dot(xi.T)    # typically (1, 1)
+        lev[i] = np.asarray(val).item()    # convert 1x1 to Python scalar
     return lev
 
 
