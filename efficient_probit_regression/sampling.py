@@ -315,3 +315,94 @@ def calculate_l2_lp_leverage_score(X: np.ndarray, p=2, fast_approx=False):
     total_score = l_2_leverage_score + l_p_leverage_score
 
     return total_score, p
+
+
+# random evaluations
+
+
+def compute_random_evaluation_probabilities(
+    X: np.ndarray,
+    m: int = 50,
+    p: float = 2.0,
+    eps: float = 1e-12,
+    rng: np.random.Generator | None = None,
+) -> np.ndarray:
+    """
+    Approximiert Sampling-Wahrscheinlichkeiten über zufällige Auswertungen:
+
+        p_i = (1/m) * sum_{j=1..m}  |(A x_j)_i|^p / ||A x_j||_p^p
+
+    wobei x_j zufällige Vektoren sind (hier: Standardnormalverteilung).
+
+    :param X: Datenmatrix A der Form (n, d)
+    :param m: Anzahl zufälliger Auswertungen (Random Points)
+    :param p: p-Norm-Exponent (p > 0)
+    :param eps: numerische Stabilisierung, falls ||A x||_p^p ~ 0
+    :param rng: optionaler RNG für Reproduzierbarkeit
+
+    :return: Wahrscheinlichkeitsvektor der Länge n (Summe = 1)
+    """
+    if X.ndim != 2:
+        raise ValueError("X must be 2D!")
+    if m <= 0:
+        raise ValueError("m must be greater than zero!")
+    if p <= 0:
+        raise ValueError("p must be greater than zero!")
+
+    n, d = X.shape
+    rng = _rng if rng is None else rng
+
+    probs = np.zeros(n, dtype=float)
+
+    for _ in range(m):
+        x = rng.normal(loc=0.0, scale=1.0, size=d)     # x_j in R^d
+        Ax = X @ x                                     # (n,)
+        num = np.abs(Ax) ** p                           # |(Ax)_i|^p
+        den = float(np.sum(num))                        # ||Ax||_p^p
+
+        if not np.isfinite(den) or den <= eps:
+            # Degenerierter Fall: trägt nichts Sinnvolles bei
+            continue
+
+        probs += num / den
+
+    probs /= m
+
+    s = probs.sum()
+    if not np.isfinite(s) or s <= 0:
+        # Fallback: uniform, falls alles degeneriert war
+        return np.full(n, 1.0 / n, dtype=float)
+
+    return probs / s
+
+
+def random_evaluation_sampling(
+    X: np.ndarray,
+    y: np.ndarray,
+    sample_size: int,
+    m: int = 50,
+    p: float = 2.0,
+    rng: np.random.Generator | None = None,
+):
+    """
+    Ziehe ein Sample ohne Zurücklegen anhand von Wahrscheinlichkeiten aus
+    compute_random_evaluation_probabilities(...).
+
+    :return: (X_reduced, y_reduced, w, p_selected)
+             w sind Horvitz-Thompson-ähnliche Gewichte: w_i = 1 / (p_i * sample_size)
+    """
+    _check_sample(X, y, sample_size)
+
+    rng = _rng if rng is None else rng
+    prob = compute_random_evaluation_probabilities(X, m=m, p=p, rng=rng)
+
+    w = 1.0 / (prob * sample_size)
+
+    sample_indices = rng.choice(
+        X.shape[0],
+        size=sample_size,
+        replace=False,
+        p=prob,
+    )
+
+    return X[sample_indices], y[sample_indices], w[sample_indices], prob[sample_indices]
