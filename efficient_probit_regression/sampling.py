@@ -358,8 +358,8 @@ def compute_random_evaluation_probabilities(
     for _ in range(m):
         x = rng.normal(loc=0.0, scale=1.0, size=d)     # x_j in R^d
         Ax = X @ x                                     # (n,)
-        num = np.abs(Ax) ** p                           # |(Ax)_i|^p
-        den = float(np.sum(num))                        # ||Ax||_p^p
+        num = np.abs(Ax) ** p                          # |(Ax)_i|^p
+        den = float(np.sum(num))                       # ||Ax||_p^p
 
         if not np.isfinite(den) or den <= eps:
             # Degenerierter Fall: trägt nichts Sinnvolles bei
@@ -407,3 +407,83 @@ def random_evaluation_sampling(
     )
 
     return X[sample_indices], y[sample_indices], w[sample_indices], prob[sample_indices]
+
+
+# v2
+
+
+def compute_random_evaluations_probabilities_v2(X, m=100, p=2.0, x_dist="normal", rng=None, eps=1e-12):
+    """
+    Compute sampling probabilities via random evaluations:
+
+        p_i = (1/m) * sum_{j=1..m}  |a_i^T x_j|^p / ||A x_j||_p^p
+
+    where A = X (n x d), a_i is the i-th row of X, and x_j are random vectors in R^d.
+
+    Parameters
+    ----------
+    X : array-like, shape (n, d)
+        Data matrix (A).
+    m : int
+        Number of random evaluation vectors x_j.
+    p : float
+        The p in |.|^p and ||.||_p^p.
+    x_dist : {"normal", "rademacher"}
+        Distribution for x_j:
+        - "normal": iid N(0,1)
+        - "rademacher": iid +/- 1 with prob 1/2
+    rng : None, int, or np.random.Generator
+        Random generator (or seed). If None, uses default generator.
+    eps : float
+        Small value to guard against division by zero.
+
+    Returns
+    -------
+    probs : np.ndarray, shape (n,)
+        Sampling probabilities, nonnegative and summing to 1.
+    """
+    X = np.asarray(X)
+    if X.ndim != 2:
+        raise ValueError("X must be a 2D array of shape (n, d).")
+    n, d = X.shape
+    if m <= 0:
+        raise ValueError("m must be a positive integer.")
+    if p <= 0:
+        raise ValueError("p must be > 0.")
+
+    # RNG setup
+    if isinstance(rng, np.random.Generator):
+        gen = rng
+    else:
+        gen = np.random.default_rng(rng)
+
+    # Draw random evaluation vectors (d x m)
+    if x_dist == "normal":
+        R = gen.standard_normal(size=(d, m))
+    elif x_dist == "rademacher":
+        R = gen.integers(0, 2, size=(d, m)) * 2 - 1  # +/-1
+    else:
+        raise ValueError("x_dist must be 'normal' or 'rademacher'.")
+
+    # Compute A x_j for all j at once: (n x m)
+    Y = X @ R
+
+    # Elementwise |.|^p: (n x m)
+    Z = np.abs(Y) ** p
+
+    # Denominators: ||A x_j||_p^p = sum_i |a_i^T x_j|^p, shape (m,)
+    den = Z.sum(axis=0)
+
+    # Guard against rare degenerate cases where den == 0
+    den = np.maximum(den, eps)
+
+    # For each j, contribution is Z[:, j] / den[j]; average over j
+    probs = (Z / den).mean(axis=1)
+
+    # Numerical cleanup: enforce nonnegativity & sum to 1
+    probs = np.maximum(probs, 0.0)
+    s = probs.sum()
+    if s <= 0:
+        # Fallback (should be extremely rare): uniform
+        return np.full(n, 1.0 / n)
+    return probs / s
