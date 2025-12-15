@@ -321,17 +321,17 @@ def calculate_l2_lp_leverage_score(X: np.ndarray, p=2, fast_approx=False):
 # random evaluations
 
 
-def compute_random_evaluations_probabilities(X, m=50, p=2.0, x_dist="normal", rng=None, eps=1e-12):
+def compute_random_evaluations_probabilities(X: np.ndarray, m=50, p=2.0, x_dist="normal", rng=None, eps=1e-12):
     """
     Compute sampling probabilities via random evaluations:
 
-        p_i = (1/m) * sum_{j=1..m}  |a_i^T x_j|^p / ||A x_j||_p^p
+        p_i = (1/m) * sum_{j=1...m} |a_i x_j|^p / ||A x_j||_p^p
 
     where A = X (n x d), a_i is the i-th row of X, and x_j are random vectors in R^d.
 
     Parameters
     ----------
-    X : array-like, shape (n, d)
+    X : np.ndarray, shape (n, d)
         Data matrix (A).
     m : int
         Number of random evaluation vectors x_j.
@@ -342,13 +342,13 @@ def compute_random_evaluations_probabilities(X, m=50, p=2.0, x_dist="normal", rn
         - "normal": iid N(0,1)
         - "rademacher": iid +/- 1 with prob 1/2
     rng : None, int, or np.random.Generator
-        Random generator (or seed). If None, uses default generator.
+        Random generator (or seed). If None, uses the default generator.
     eps : float
         Small value to guard against division by zero.
 
     Returns
     -------
-    probs : np.ndarray, shape (n,)
+    probs : np.ndarray
         Sampling probabilities, nonnegative and summing to 1.
     """
     X = np.asarray(X)
@@ -383,13 +383,13 @@ def compute_random_evaluations_probabilities(X, m=50, p=2.0, x_dist="normal", rn
     # Denominators: ||A x_j||_p^p = sum_i |a_i^T x_j|^p, shape (m,)
     den = Z.sum(axis=0)
 
-    # Guard against rare degenerate cases where den == 0
+    # Guard against the case where den == 0
     den = np.maximum(den, eps)
 
-    # For each j, contribution is Z[:, j] / den[j]; average over j
-    probs = (Z / den).mean(axis=1)
+    # Calculate the p_i = (1/m) * sum_{j=1...m} |a_i x_j|^p / ||A x_j||_p^p
+    probs = (Z / den).mean(axis=1)   #.mean(axis=1) calculates the means of column j (j=1...m)
 
-    # Numerical cleanup: enforce nonnegativity & sum to 1
+    # Numerical cleanup: probs >= 0 & sum to 1
     probs = np.maximum(probs, 0.0)
     s = probs.sum()
     if s <= 0:
@@ -412,7 +412,7 @@ def random_evaluation_sampling(
     compute_random_evaluation_probabilities(...).
 
     :return: (X_reduced, y_reduced, w, p_selected)
-             w sind Horvitz-Thompson-ähnliche Gewichte: w_i = 1 / (p_i * sample_size)
+             w sind Gewichte: w_i = 1 / (p_i * sample_size)
     """
     _check_sample(X, y, sample_size)
 
