@@ -99,7 +99,7 @@ def to_density(X: np.ndarray):
 
 def to_density_X_Y(X: ndarray, Y: ndarray):
     """
-    Turns the combination of two scores into a density.
+    Turns the combination of two scores into a density. Special for l_2 + l_p.
     """
     return (X + Y) / (X.sum() + Y.sum())
 
@@ -408,11 +408,11 @@ def random_evaluation_sampling(
     rng: np.random.Generator | None = None,
 ):
     """
-    Ziehe ein Sample ohne Zurücklegen anhand von Wahrscheinlichkeiten aus
+    Draw a sample without replacement based on probabilities from
     compute_random_evaluation_probabilities(...).
 
     :return: (X_reduced, y_reduced, w, p_selected)
-             w sind Gewichte: w_i = 1 / (p_i * sample_size)
+             w are weights: w_i = 1 / (p_i * sample_size)
     """
     _check_sample(X, y, sample_size)
 
