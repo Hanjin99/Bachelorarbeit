@@ -253,7 +253,7 @@ def calculate_lewis_weights_exact(X, p=1.0, T=20):
         # print("|w_t - w_t+1|/|w_t| = ", np.linalg.norm(w - w_nxt) / np.linalg.norm(w))
         w = w_nxt
 
-    # return np.array(w + 1.0 / n, dtype=float) #TODO
+    # return np.array(w + 1.0 / n, dtype=float)
     return np.array(w, dtype=float)
 
 
@@ -321,7 +321,7 @@ def calculate_l2_lp_leverage_score(X: np.ndarray, p=2, fast_approx=False):
 # random evaluations
 
 
-def compute_random_evaluations_probabilities(X: np.ndarray, m=50, p=2.0, x_dist="normal", rng=None, eps=1e-12):
+def compute_random_evaluations_probabilities(X: np.ndarray, m=50, p=2.0, rng=None, eps=1e-12):
     """
     Compute sampling probabilities via random evaluations:
 
@@ -337,10 +337,6 @@ def compute_random_evaluations_probabilities(X: np.ndarray, m=50, p=2.0, x_dist=
         Number of random evaluation vectors x_j.
     p : float
         The p in |.|^p and ||.||_p^p.
-    x_dist : {"normal", "rademacher"}
-        Distribution for x_j:
-        - "normal": iid N(0,1)
-        - "rademacher": iid +/- 1 with prob 1/2
     rng : None, int, or np.random.Generator
         Random generator (or seed). If None, uses the default generator.
     eps : float
@@ -367,12 +363,7 @@ def compute_random_evaluations_probabilities(X: np.ndarray, m=50, p=2.0, x_dist=
         gen = np.random.default_rng(rng)
 
     # Draw random evaluation vectors (d x m)
-    if x_dist == "normal":
-        R = gen.standard_normal(size=(d, m))
-    elif x_dist == "rademacher":
-        R = gen.integers(0, 2, size=(d, m)) * 2 - 1  # +/-1
-    else:
-        raise ValueError("x_dist must be 'normal' or 'rademacher'.")
+    R = gen.integers(0, 2, size=(d, m)) * 2 - 1  # +/-1
 
     # Compute A x_j for all j at once: (n x m)
     Y = X @ R
@@ -417,7 +408,7 @@ def random_evaluation_sampling(
     _check_sample(X, y, sample_size)
 
     rng = _rng if rng is None else rng
-    prob = compute_random_evaluations_probabilities(X, m=m, p=p, rng=rng, x_dist=x_dist)
+    prob = compute_random_evaluations_probabilities(X, m=m, p=p, rng=rng)
 
     w = 1.0 / (prob * sample_size)
 
