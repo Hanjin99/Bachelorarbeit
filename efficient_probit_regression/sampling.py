@@ -362,8 +362,8 @@ def compute_random_evaluations_probabilities(X: np.ndarray, m=50, p=2.0, rng=Non
     else:
         gen = np.random.default_rng(rng)
 
-    # Draw random evaluation vectors (d x m)
-    R = gen.integers(0, 2, size=(d, m)) * 2 - 1  # +/-1
+    # Draw random evaluation vectors (d x m) (Gaussian Matrix)
+    R = gen.standard_normal(size=(d, m))
 
     # Compute A x_j for all j at once: (n x m)
     Y = X @ R
