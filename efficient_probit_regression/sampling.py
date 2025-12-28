@@ -371,7 +371,88 @@ def compute_random_evaluations_probabilities(X: np.ndarray, m=50, p=2.0, rng=Non
     # Elementwise |.|^p: (n x m)
     Z = np.abs(Y) ** p
 
-    # Denominators: ||A x_j||_p^p = sum_i |a_i^T x_j|^p, shape (m,)
+    # Denominators: ||A x_j||_p^p = sum_i |a_i^T x_j|^p, shape (m,) (a one-dimensional NumPy array of length m)
+    den = Z.sum(axis=0)
+
+    # Guard against the case where den == 0
+    den = np.maximum(den, eps)
+
+    # Calculate the p_i = (1/m) * sum_{j=1...m} |a_i x_j|^p / ||A x_j||_p^p
+    probs = (Z / den).mean(axis=1)   #.mean(axis=1) calculates the means of column j (j=1...m)
+
+    # Numerical cleanup: probs >= 0 & sum to 1
+    probs = np.maximum(probs, 0.0)
+    s = probs.sum()
+    if s <= 0:
+        # Fallback (should be extremely rare): uniform
+        return np.full(n, 1.0 / n)
+    return probs / s
+
+
+def compute_random_evaluations_probabilities_v2(X: np.ndarray, m=50, p=2.0, rng=None, eps=1e-12):
+    """
+    Compute sampling probabilities via random evaluations with ||A x||_p^p <= 1:
+
+        p_i = ((1/m) * sum_{j=1...m} |a_i x_j|^p) / ((1/m) * sum_{j=1...m} ||A x_j||_p^p)
+
+    where A = X (n x d), a_i is the i-th row of X, and x_j are random vectors in R^d.
+
+    Parameters
+    ----------
+    X : np.ndarray, shape (n, d)
+        Data matrix (A).
+    m : int
+        Number of random evaluation vectors x_j.
+    p : float
+        The p in |.|^p and ||.||_p^p.
+    rng : None, int, or np.random.Generator
+        Random generator (or seed). If None, uses the default generator.
+    eps : float
+        Small value to guard against division by zero.
+
+    Returns
+    -------
+    probs : np.ndarray
+        Sampling probabilities, nonnegative and summing to 1.
+    """
+    X = np.asarray(X)
+    if not len(X.shape) == 2:
+        raise ValueError("X must be 2D!")
+    n, d = X.shape
+    if m <= 0 or not isinstance(m, int):
+        raise ValueError("m must be a positive integer.")
+    if p <= 0:
+        raise ValueError("p must be > 0.")
+
+    # RNG setup
+    if isinstance(rng, np.random.Generator):
+        gen = rng
+    else:
+        gen = np.random.default_rng(rng)
+
+    # Draw random evaluation vectors (d x m) (Gaussian Matrix)
+    R = gen.standard_normal(size=(d, m))
+
+    # Compute A x_j for all j at once: (n x m)
+    Y = X @ R
+
+    # Draw m values uniformly at random, from the interval [0,1]
+    s = gen.random(m)
+
+    # Determine eta_i = |A x_i|_p, for i = 1...m
+    eta = np.linalg.norm(Y, axis=0, ord=p)
+
+    # Let B (n x m) be the new corrected matrix derived from Y, for ||A x||_p^p <= 1
+    # Guard against division by zero for eta
+    eta_safe = np.maximum(eta, eps)
+    B = Y * s / eta_safe
+
+    #--------------------- #TODO
+
+    # Elementwise |.|^p: (n x m)
+    Z = np.abs(Y) ** p
+
+    # Denominators: ||A x_j||_p^p = sum_i |a_i^T x_j|^p, shape (m,) (a one-dimensional NumPy array of length m)
     den = Z.sum(axis=0)
 
     # Guard against the case where den == 0
