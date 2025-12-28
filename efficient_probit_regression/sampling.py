@@ -59,7 +59,7 @@ def fast_QR(X, p=2.0):
             X_sketch[f[i]] += g[i] * X[i]
     else:    
         for i in range(n):
-            X_sketch[f[i]] += g[i] / np.power(lamb[i], 1 / p) * X[i]  # exponential-verteile Zufallsvariable
+            X_sketch[f[i]] += g[i] / np.power(lamb[i], 1 / p) * X[i]  # exponential-verteilte Zufallsvariable
 
     R = np.linalg.qr(X_sketch, mode="r")
     R_inv = np.linalg.inv(R)
@@ -111,7 +111,7 @@ def logit_sampling(X: np.ndarray, y: np.ndarray, sample_size: int):
     Returns X_reduced, y_reduced, weights
     """
 
-    # 1. Obtain fast QR approximation
+    # 1. Get fast QR approximation
     n, d = X.shape
 
     sketch_size = d ** 2
@@ -131,7 +131,7 @@ def logit_sampling(X: np.ndarray, y: np.ndarray, sample_size: int):
     r = np.dot(R_inv, g)
     Q = np.dot(X, r)
 
-    # 2. Obtain square roots of leverage scores and add 1/n term
+    # 2. Get square roots of leverage scores and add 1/n term
     scores = np.linalg.norm(Q, axis=1) + 1 / n
 
     # 3. draw a random sample
@@ -152,7 +152,7 @@ def logit_sampling(X: np.ndarray, y: np.ndarray, sample_size: int):
 # leverage scores
 
 
-def compute_leverage_scores(X: np.ndarray, p=2, fast_approx=False):  
+def compute_leverage_scores(X: np.ndarray, p=2.0, fast_approx=False):
     """
         Computes leverage scores.
     """
@@ -215,8 +215,8 @@ def leverage_score_sampling(
 
     w = 1 / (p * sample_size)  
     
-    _rng = np.random.default_rng()    
-    sample_indices = _rng.choice(   # _rng (see np.random)
+    rng = np.random.default_rng()
+    sample_indices = rng.choice(
         X.shape[0],
         size=sample_size,
         replace= False,       # replace = False (without replacement)
@@ -327,19 +327,19 @@ def compute_random_evaluations_probabilities(X: np.ndarray, m=50, p=2.0, rng=Non
 
         p_i = (1/m) * sum_{j=1...m} |a_i x_j|^p / ||A x_j||_p^p
 
-    where A = X (n x d), a_i is the i-th row of X, and x_j are random vectors in R^d.
+    Where A = X (n x d), a_i is the i-th row of X, and x_j are random vectors in R^d.
 
     Parameters
     ----------
-    X : np.ndarray, shape (n, d)
+    X: np.ndarray, shape (n, d)
         Data matrix (A).
-    m : int
+    m: int
         Number of random evaluation vectors x_j.
-    p : float
+    p: float
         The p in |.|^p and ||.||_p^p.
-    rng : None, int, or np.random.Generator
+    rng: None, int, or np.random.Generator
         Random generator (or seed). If None, uses the default generator.
-    eps : float
+    eps: float
         Small value to guard against division by zero.
 
     Returns
@@ -393,21 +393,21 @@ def compute_random_evaluations_probabilities_v2(X: np.ndarray, m=50, p=2.0, rng=
     """
     Compute sampling probabilities via random evaluations with ||A x||_p^p <= 1:
 
-        p_i = ((1/m) * sum_{j=1...m} |a_i x_j|^p) / ((1/m) * sum_{j=1...m} ||A x_j||_p^p)
+        p_i = (sum_{j=1...m} |a_i x_j|^p) / (sum_{j=1...m} ||A x_j||_p^p)
 
-    where A = X (n x d), a_i is the i-th row of X, and x_j are random vectors in R^d.
+    Where A = X (n x d), a_i is the i-th row of X, and x_j are random vectors in R^d.
 
     Parameters
     ----------
-    X : np.ndarray, shape (n, d)
+    X: np.ndarray, shape (n, d)
         Data matrix (A).
-    m : int
+    m: int
         Number of random evaluation vectors x_j.
-    p : float
+    p: float
         The p in |.|^p and ||.||_p^p.
-    rng : None, int, or np.random.Generator
+    rng: None, int, or np.random.Generator
         Random generator (or seed). If None, uses the default generator.
-    eps : float
+    eps: float
         Small value to guard against division by zero.
 
     Returns
@@ -442,24 +442,20 @@ def compute_random_evaluations_probabilities_v2(X: np.ndarray, m=50, p=2.0, rng=
     # Determine eta_i = |A x_i|_p, for i = 1...m
     eta = np.linalg.norm(Y, axis=0, ord=p)
 
-    # Let B (n x m) be the new corrected matrix derived from Y, for ||A x||_p^p <= 1
     # Guard against division by zero for eta
-    eta_safe = np.maximum(eta, eps)
-    B = Y * s / eta_safe
+    eta = np.maximum(eta, eps)
 
-    #--------------------- #TODO
+    # Let B (n x m) be the new corrected matrix derived from Y, so that ||A x||_p^p <= 1
+    B = Y * (s / eta)
 
     # Elementwise |.|^p: (n x m)
-    Z = np.abs(Y) ** p
+    Z = np.abs(B) ** p
 
     # Denominators: ||A x_j||_p^p = sum_i |a_i^T x_j|^p, shape (m,) (a one-dimensional NumPy array of length m)
     den = Z.sum(axis=0)
 
-    # Guard against the case where den == 0
-    den = np.maximum(den, eps)
-
-    # Calculate the p_i = (1/m) * sum_{j=1...m} |a_i x_j|^p / ||A x_j||_p^p
-    probs = (Z / den).mean(axis=1)   #.mean(axis=1) calculates the means of column j (j=1...m)
+    # Calculate the p_i = (sum_{j=1...m} |a_i x_j|^p) / (sum_{j=1...m} ||A x_j||_p^p)
+    probs = Z.sum(axis=1) / den.sum()  #.mean(axis=1) calculates the means of column j (j=1...m)
 
     # Numerical cleanup: probs >= 0 & sum to 1
     probs = np.maximum(probs, 0.0)
@@ -476,22 +472,28 @@ def random_evaluation_sampling(
     sample_size: int,
     m: int = 50,
     p: float = 2.0,
-    x_dist: str = "normal",
     rng: np.random.Generator | None = None,
+    scaled: bool = True,
+    eps: float = 1e-12,
 ):
     """
     Draw a sample without replacement based on probabilities from
-    compute_random_evaluation_probabilities(...).
+    compute_random_evaluation_probabilities.
 
     :return: (X_reduced, y_reduced, w, p_selected)
              w are weights: w_i = 1 / (p_i * sample_size)
     """
     _check_sample(X, y, sample_size)
 
-    rng = _rng if rng is None else rng
-    prob = compute_random_evaluations_probabilities(X, m=m, p=p, rng=rng)
+    if rng is None:
+        rng = np.random.default_rng()
 
-    w = 1.0 / (prob * sample_size)
+    if scaled:
+        prob = compute_random_evaluations_probabilities_v2(X, m=m, p=p, rng=rng)
+    else:
+        prob = compute_random_evaluations_probabilities(X, m=m, p=p, rng=rng)
+
+    w = 1.0 / (np.maximum(prob, eps) * sample_size)
 
     sample_indices = rng.choice(
         X.shape[0],
