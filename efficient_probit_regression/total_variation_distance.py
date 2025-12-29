@@ -36,7 +36,7 @@ def total_variation_distance(p, q, normalize: bool = False, tol: float = 1e-12) 
 
     # Reject clearly negative entries (allow tiny negative values due to floating point noise)
     if np.any(p < -tol) or np.any(q < -tol):
-        raise ValueError("p and q must be (approximately) nonnegative.")
+        raise ValueError("p and q must be nonnegative.")
 
     # Clip small negative round-off errors to zero
     p = np.maximum(p, 0.0)
