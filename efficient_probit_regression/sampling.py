@@ -436,7 +436,7 @@ def compute_random_evaluations_probabilities_v2(X: np.ndarray, m=50, p=2.0, rng=
     # Compute A x_j for all j at once: (n x m)
     Y = X @ R
 
-    # Draw m values uniformly at random, from the interval [0,1]
+    # Draw m values uniformly at random, from the interval [0.0, 1.0)
     s = gen.random(m)
 
     # Determine eta_i = |A x_i|_p, for i = 1...m
