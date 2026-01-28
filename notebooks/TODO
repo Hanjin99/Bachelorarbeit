@@ -1,7 +1,5 @@
 Tabelle erstellen:
 
-- TVD für die vier Methoden (Code laufen lassen, ca. 1h)
-
 - Bestimmung von c
 
 - Behauptung von min(l_ip, l_i2) * 0.5 <= w_i <= max(l_ip, l_i2) * 2
