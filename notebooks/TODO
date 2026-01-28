@@ -1,7 +1,0 @@
-Tabelle erstellen:
-
-- Bestimmung von c
-
-- Behauptung von min(l_ip, l_i2) * 0.5 <= w_i <= max(l_ip, l_i2) * 2
-
-- TopK_thresholds_table
