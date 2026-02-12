@@ -234,10 +234,11 @@ def leverage_score_sampling(
 
 # lewis weights
 
+#TODO
 # berechnet l_2 leverage score
 def calculate_lev_score_exact(X):
     Xt = X.T
-    XXinv = np.linalg.pinv(Xt.dot(X))
+    XXinv = np.linalg.pinv(Xt.dot(X)) # statt pinv, inv nutzen oder solve
     lev = np.zeros(X.shape[0])
     for i in range(X.shape[0]):
         xi = X[i : i + 1, :]
