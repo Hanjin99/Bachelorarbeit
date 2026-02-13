@@ -234,17 +234,21 @@ def leverage_score_sampling(
 
 # lewis weights
 
-#TODO
-# berechnet l_2 leverage score
-def calculate_lev_score_exact(X):
-    Xt = X.T
-    XXinv = np.linalg.pinv(Xt.dot(X)) # statt pinv, inv nutzen oder solve
-    lev = np.zeros(X.shape[0])
-    for i in range(X.shape[0]):
-        xi = X[i : i + 1, :]
-        val = (xi.dot(XXinv)).dot(xi.T)    # typically (1, 1)
-        lev[i] = np.asarray(val).item()    # convert 1x1 to Python scalar
-    return lev
+def calculate_lev_2_score(X):
+    Q, *_ = np.linalg.qr(X)
+    leverage_scores = np.power(np.linalg.norm(Q, axis=1, ord=2.0), 2.0)
+    return leverage_scores
+
+
+# def calculate_lev_score_exact(X):
+#     Xt = X.T
+#     XXinv = np.linalg.pinv(Xt.dot(X)) # statt pinv, inv nutzen oder solve
+#     lev = np.zeros(X.shape[0])
+#     for i in range(X.shape[0]):
+#         xi = X[i : i + 1, :]
+#         val = (xi.dot(XXinv)).dot(xi.T)    # typically (1, 1)
+#         lev[i] = np.asarray(val).item()    # convert 1x1 to Python scalar
+#     return lev
 
 
 def calculate_lewis_weights_exact(X, p=1.0, T=20):
@@ -255,7 +259,7 @@ def calculate_lewis_weights_exact(X, p=1.0, T=20):
         Wp = diags(np.power(w, 0.5 - 1.0 / p))
         # Q = qr(Wp.dot(X))
         # s = _calculate_sensitivities_leverage(Q)
-        s = calculate_lev_score_exact(Wp.dot(X))
+        s = calculate_lev_2_score(Wp.dot(X))
         w_nxt = np.power(w, 1.0 - p / 2.0) * np.power(s, p / 2.0)
         # print("|w_t - w_t+1|/|w_t| = ", np.linalg.norm(w - w_nxt) / np.linalg.norm(w))
         w = w_nxt
@@ -317,7 +321,7 @@ def calculate_l2_lp_leverage_score(X: np.ndarray, p=2, fast_approx=False):
     """
     Returns the sum of the l_2 and l_p leverage scores (total_score), and it's density (p).
     """
-    l_2_leverage_score = calculate_lev_score_exact(X)
+    l_2_leverage_score = calculate_lev_2_score(X)
     l_p_leverage_score = compute_leverage_scores(X, p=p, fast_approx=fast_approx)
     p = to_density_X_Y(l_2_leverage_score, l_p_leverage_score)
     total_score = l_2_leverage_score + l_p_leverage_score

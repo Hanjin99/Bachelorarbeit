@@ -1,4 +1,1 @@
-1.	Sampling l2 untersuchen (statt pinv, inv oder solve verwenden)
-2.	Grafiken von max(q/p, p/q) die X-Achse gleich halten (oben und unten)
-3.	Untersuche die maximale Abweichung von lewis weights zu 2 * max(l_ip, l_i2)
-4.	Bestimmung von c = max(lewis_prob / l2_lp_prob)
+1.  Grafiken von max(q/p, p/q) die X-Achse gleich halten (oben und unten)
