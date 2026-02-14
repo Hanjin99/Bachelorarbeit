@@ -60,25 +60,25 @@ KDDCup,2.0,Lewis weight,2882,96991,169259
 KDDCup,2.0,Random evaluations,6555,192925,337175
 KDDCup,2.0,l2+lp leverage score,2882,96991,169259
 Covertype,1.0,lp leverage score,224014,492339,533812
-Covertype,1.0,Lewis weight,73280,426686,495112
+Covertype,1.0,Lewis weight,66568,423296,493149
 Covertype,1.0,Random evaluations,236549,501186,539481
-Covertype,1.0,l2+lp leverage score,223571,492199,533735
+Covertype,1.0,l2+lp leverage score,223535,492189,533729
 Covertype,1.3,lp leverage score,190396,477333,524827
-Covertype,1.3,Lewis weight,68854,414481,486108
+Covertype,1.3,Lewis weight,62207,410495,483758
 Covertype,1.3,Random evaluations,219538,493183,534724
-Covertype,1.3,l2+lp leverage score,187793,476327,524236
+Covertype,1.3,l2+lp leverage score,187555,476253,524195
 Covertype,1.5,lp leverage score,159313,461802,515096
-Covertype,1.5,Lewis weight,66232,406904,480458
+Covertype,1.5,Lewis weight,60609,403374,478352
 Covertype,1.5,Random evaluations,208159,487439,531262
-Covertype,1.5,l2+lp leverage score,152731,458733,513204
+Covertype,1.5,l2+lp leverage score,152014,458475,513057
 Covertype,1.7,lp leverage score,120442,439175,500505
-Covertype,1.7,Lewis weight,63763,399765,475095
+Covertype,1.7,Lewis weight,58494,396588,473222
 Covertype,1.7,Random evaluations,196821,481364,527559
-Covertype,1.7,l2+lp leverage score,109287,432316,496102
+Covertype,1.7,l2+lp leverage score,107505,431534,495639
 Covertype,2.0,lp leverage score,53475,384746,464420
-Covertype,2.0,Lewis weight,60413,389887,467587
+Covertype,2.0,Lewis weight,53475,384746,464420
 Covertype,2.0,Random evaluations,180017,471622,521530
-Covertype,2.0,l2+lp leverage score,56886,387308,465999
+Covertype,2.0,l2+lp leverage score,53475,384746,464420
 Example2D,1.0,lp leverage score,65,146,159
 Example2D,1.0,Lewis weight,61,147,160
 Example2D,1.0,Random evaluations,57,143,158
