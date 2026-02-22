@@ -1,100 +1,100 @@
 dataset,p,method,k50,k90,k95
-Webspam,1.0,lp leverage score,104372,274267,308531
+Webspam,1.0,lp leverage score,44907,236059,282494
 Webspam,1.0,Lewis weight,44342,233971,280168
 Webspam,1.0,Random evaluations,106218,284657,315360
-Webspam,1.0,l2+lp leverage score,104015,274080,308422
-Webspam,1.3,lp leverage score,82404,254864,295449
+Webspam,1.0,l2+lp leverage score,27737,212749,263200
+Webspam,1.3,lp leverage score,36436,219357,267496
 Webspam,1.3,Lewis weight,32264,214420,263883
 Webspam,1.3,Random evaluations,81925,269237,305662
-Webspam,1.3,l2+lp leverage score,80651,253772,294672
-Webspam,1.5,lp leverage score,66526,239899,283343
+Webspam,1.3,l2+lp leverage score,18950,183313,239216
+Webspam,1.5,lp leverage score,20464,191147,244668
 Webspam,1.5,Lewis weight,26163,201920,253695
 Webspam,1.5,Random evaluations,64743,255912,296894
-Webspam,1.5,l2+lp leverage score,62409,236799,280871
-Webspam,1.7,lp leverage score,48402,220517,266859
+Webspam,1.5,l2+lp leverage score,16431,175334,232167
+Webspam,1.7,lp leverage score,9264,177019,235769
 Webspam,1.7,Lewis weight,21320,189948,244001
 Webspam,1.7,Random evaluations,46783,238410,285282
-Webspam,1.7,l2+lp leverage score,41474,213504,261359
+Webspam,1.7,l2+lp leverage score,15602,172958,230208
 Webspam,2.0,lp leverage score,15994,172853,229970
 Webspam,2.0,Lewis weight,15994,172853,229970
 Webspam,2.0,Random evaluations,21783,199412,259306
 Webspam,2.0,l2+lp leverage score,15994,172853,229970
-Iris,1.0,lp leverage score,60,128,138
+Iris,1.0,lp leverage score,54,121,133
 Iris,1.0,Lewis weight,59,128,138
 Iris,1.0,Random evaluations,60,126,137
-Iris,1.0,l2+lp leverage score,58,127,138
-Iris,1.3,lp leverage score,55,126,137
+Iris,1.0,l2+lp leverage score,47,120,133
+Iris,1.3,lp leverage score,42,115,130
 Iris,1.3,Lewis weight,54,125,137
 Iris,1.3,Random evaluations,56,123,135
-Iris,1.3,l2+lp leverage score,53,125,136
-Iris,1.5,lp leverage score,52,124,136
+Iris,1.3,l2+lp leverage score,47,120,133
+Iris,1.5,lp leverage score,42,112,127
 Iris,1.5,Lewis weight,51,124,136
 Iris,1.5,Random evaluations,54,121,134
-Iris,1.5,l2+lp leverage score,50,123,135
-Iris,1.7,lp leverage score,49,122,134
+Iris,1.5,l2+lp leverage score,45,120,133
+Iris,1.7,lp leverage score,49,119,131
 Iris,1.7,Lewis weight,48,122,134
 Iris,1.7,Random evaluations,52,119,133
-Iris,1.7,l2+lp leverage score,47,121,134
+Iris,1.7,l2+lp leverage score,44,119,132
 Iris,2.0,lp leverage score,44,119,132
 Iris,2.0,Lewis weight,44,119,132
 Iris,2.0,Random evaluations,49,116,130
 Iris,2.0,l2+lp leverage score,44,119,132
-KDDCup,1.0,lp leverage score,79289,335188,414235
+KDDCup,1.0,lp leverage score,8001,146062,201688
 KDDCup,1.0,Lewis weight,6467,130311,193400
 KDDCup,1.0,Random evaluations,122458,404187,448527
-KDDCup,1.0,l2+lp leverage score,78611,334394,413838
-KDDCup,1.3,lp leverage score,45807,269958,381785
+KDDCup,1.0,l2+lp leverage score,3857,111061,180013
+KDDCup,1.3,lp leverage score,4191,109362,162745
 KDDCup,1.3,Lewis weight,4634,117029,183060
 KDDCup,1.3,Random evaluations,88982,377836,435159
-KDDCup,1.3,l2+lp leverage score,42862,263861,378737
-KDDCup,1.5,lp leverage score,27424,209837,343839
+KDDCup,1.3,l2+lp leverage score,2949,98907,170008
+KDDCup,1.5,lp leverage score,4919,116729,180115
 KDDCup,1.5,Lewis weight,3943,110096,177960
 KDDCup,1.5,Random evaluations,61909,350973,421609
-KDDCup,1.5,l2+lp leverage score,23688,202738,333299
-KDDCup,1.7,lp leverage score,13738,172472,275961
+KDDCup,1.5,l2+lp leverage score,2871,97096,169076
+KDDCup,1.7,lp leverage score,494,24158,94986
 KDDCup,1.7,Lewis weight,3416,104280,173963
 KDDCup,1.7,Random evaluations,36104,309266,400644
-KDDCup,1.7,l2+lp leverage score,10089,159955,246441
+KDDCup,1.7,l2+lp leverage score,2932,97308,169785
 KDDCup,2.0,lp leverage score,2882,96991,169259
 KDDCup,2.0,Lewis weight,2882,96991,169259
 KDDCup,2.0,Random evaluations,6555,192925,337175
 KDDCup,2.0,l2+lp leverage score,2882,96991,169259
-Covertype,1.0,lp leverage score,224014,492339,533812
-Covertype,1.0,Lewis weight,66568,423296,493149
+Covertype,1.0,lp leverage score,144358,461589,516023
+Covertype,1.0,Lewis weight,69255,424862,494067
 Covertype,1.0,Random evaluations,236549,501186,539481
-Covertype,1.0,l2+lp leverage score,223535,492189,533729
-Covertype,1.3,lp leverage score,190396,477333,524827
+Covertype,1.0,l2+lp leverage score,77963,419011,488834
+Covertype,1.3,lp leverage score,120059,439930,502711
 Covertype,1.3,Lewis weight,62207,410495,483758
 Covertype,1.3,Random evaluations,219538,493183,534724
-Covertype,1.3,l2+lp leverage score,187555,476253,524195
-Covertype,1.5,lp leverage score,159313,461802,515096
-Covertype,1.5,Lewis weight,60609,403374,478352
+Covertype,1.3,l2+lp leverage score,58910,392422,470181
+Covertype,1.5,lp leverage score,94131,411407,481921
+Covertype,1.5,Lewis weight,59793,402874,478060
 Covertype,1.5,Random evaluations,208159,487439,531262
-Covertype,1.5,l2+lp leverage score,152014,458475,513057
-Covertype,1.7,lp leverage score,120442,439175,500505
-Covertype,1.7,Lewis weight,58494,396588,473222
+Covertype,1.5,l2+lp leverage score,54628,386543,465712
+Covertype,1.7,lp leverage score,89026,423211,491458
+Covertype,1.7,Lewis weight,57453,395468,472497
 Covertype,1.7,Random evaluations,196821,481364,527559
-Covertype,1.7,l2+lp leverage score,107505,431534,495639
+Covertype,1.7,l2+lp leverage score,54453,387491,466494
 Covertype,2.0,lp leverage score,53475,384746,464420
 Covertype,2.0,Lewis weight,53475,384746,464420
 Covertype,2.0,Random evaluations,180017,471622,521530
 Covertype,2.0,l2+lp leverage score,53475,384746,464420
-Example2D,1.0,lp leverage score,65,146,159
+Example2D,1.0,lp leverage score,44,120,141
 Example2D,1.0,Lewis weight,61,147,160
 Example2D,1.0,Random evaluations,57,143,158
-Example2D,1.0,l2+lp leverage score,63,145,159
-Example2D,1.3,lp leverage score,58,143,158
+Example2D,1.0,l2+lp leverage score,44,134,153
+Example2D,1.3,lp leverage score,38,121,140
 Example2D,1.3,Lewis weight,55,143,158
 Example2D,1.3,Random evaluations,48,137,155
-Example2D,1.3,l2+lp leverage score,55,142,157
-Example2D,1.5,lp leverage score,53,141,156
+Example2D,1.3,l2+lp leverage score,42,133,152
+Example2D,1.5,lp leverage score,49,127,146
 Example2D,1.5,Lewis weight,51,140,156
 Example2D,1.5,Random evaluations,41,133,152
-Example2D,1.5,l2+lp leverage score,51,139,156
-Example2D,1.7,lp leverage score,49,138,155
+Example2D,1.5,l2+lp leverage score,42,133,152
+Example2D,1.7,lp leverage score,55,138,154
 Example2D,1.7,Lewis weight,47,138,155
 Example2D,1.7,Random evaluations,36,129,149
-Example2D,1.7,l2+lp leverage score,46,137,154
+Example2D,1.7,l2+lp leverage score,42,134,152
 Example2D,2.0,lp leverage score,42,134,152
 Example2D,2.0,Lewis weight,42,134,152
 Example2D,2.0,Random evaluations,29,122,144

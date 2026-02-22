@@ -1,8 +1,0 @@
-1. fast_approx = True, für p nicht gleich 2
-2. Grafiken von max(q/p, p/q) (die X-Achse gleich halten), Ausprobieren: y-Achse auch gleich halten
-3. Beschreibung von lp Leverage Score: bei lp die QR-Zerlegung beschreiben und als Formel.
-    Und Formel QR und für p nicht gleich 2 die Variante mit Sketching.
-4. In Fragestellung: Sensitivitäts Framework (Notizen aus der Besprechung) beschreiben und Beziehung von O(k) und O(c*k)
-   an benötigten Daten einbauen. Sowie der Zusammenhang von Hähne und Eier: (optimales Ergebnis mit ganzem Datensatz,
-   aber langsam und teuer), fast optimal mit Fehler Korrektur Konstante c, dafür schneller.
-   Fragestellung mit Sketching (Paper: Sketching und Coresets)

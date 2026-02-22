@@ -160,6 +160,9 @@ def compute_leverage_scores(X: np.ndarray, p=2.0, fast_approx=False, rep = 20):
     if not len(X.shape) == 2:
         raise ValueError("X must be 2D!")
 
+    if p != 2.0:
+        fast_approx = True
+
     if not fast_approx: # boolean, schnellere oder nicht die schnellere Q-R-Zerlegung
         Q, *_ = np.linalg.qr(X)
     else:
@@ -168,7 +171,7 @@ def compute_leverage_scores(X: np.ndarray, p=2.0, fast_approx=False, rep = 20):
         H = []
         for i in range(rep):
             H.append(fast_QR(X, p=p))    # ein Möglichkeit wie man eine Zerlegung schneller machen kann
-        Q = mean(H)
+        Q = np.mean(H, axis=0)
 
     leverage_scores = np.power(np.linalg.norm(Q, axis=1, ord=p), p)
 
