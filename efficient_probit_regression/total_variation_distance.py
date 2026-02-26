@@ -34,10 +34,11 @@ def total_variation_distance(p, q, normalize: bool = False, tol: float = 1e-12) 
     if not (np.all(np.isfinite(p)) and np.all(np.isfinite(q))):
         raise ValueError("p and q must not contain NaN or Inf.")
 
-    # Reject clearly negative entries
+    # Reject clearly negative entries (allow tiny negative values due to floating point noise)
     if np.any(p < -tol) or np.any(q < -tol):
         raise ValueError("p and q must be nonnegative.")
 
+    # Clip small negative round-off errors to zero
     p = np.maximum(p, 0.0)
     q = np.maximum(q, 0.0)
 
