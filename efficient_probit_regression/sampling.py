@@ -2,7 +2,6 @@ import numpy as np
 from numpy import ndarray
 from scipy.stats import expon
 from scipy.sparse import diags
-from statistics import mean
 
 # random number generator
 _rng = np.random.default_rng()
@@ -166,11 +165,11 @@ def compute_leverage_scores(X: np.ndarray, p=2.0, fast_approx=False, rep = 20):
     if not fast_approx: # boolean, schnellere oder nicht die schnellere Q-R-Zerlegung
         Q, *_ = np.linalg.qr(X)
     else:
-        # fast_QR() benutzt Randomisierung, durch Wiederholung rep und daraus eine Mittelwerteberechnung
+        # fast_QR() benutzt Randomisierung, durch Wiederholungen und daraus eine Mittelwerteberechnung
         # wird der Fehler kleiner
         H = []
         for i in range(rep):
-            H.append(fast_QR(X, p=p))    # ein Möglichkeit wie man eine Zerlegung schneller machen kann
+            H.append(fast_QR(X, p=p))    # eine Möglichkeit wie man eine Zerlegung schneller machen kann
         Q = np.mean(H, axis=0)
 
     leverage_scores = np.power(np.linalg.norm(Q, axis=1, ord=p), p)
