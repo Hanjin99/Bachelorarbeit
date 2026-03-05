@@ -49,3 +49,6 @@ po/*~
 rsconnect/
 *.pyc
 /notebooks/Plots/probability_distributions.pkl
+
+# PyCharm Interpreter Settings
+/.idea/*.iml
