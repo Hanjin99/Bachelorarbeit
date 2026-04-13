@@ -52,3 +52,12 @@ rsconnect/
 
 # PyCharm Interpreter Settings
 /.idea/*.iml
+/.data-cache/covertype_X.npy
+/.data-cache/covertype_y.npy
+/.data-cache/iris_X.npy
+/.data-cache/iris_y.npy
+/.data-cache/kddcup_X.npy
+/.data-cache/kddcup_y.npy
+/notebooks/Plots/probability_distributions_p_greater_2.pkl
+/.data-cache/webspam_X.npy
+/.data-cache/webspam_y.npy
